@@ -1,3 +1,4 @@
+-- Table creation with no user duplication
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
