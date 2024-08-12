@@ -11,14 +11,14 @@ def stats_logger():
     client = MongoClient("mongodb://127.0.0.1:27017")
     collection = client.logs.Nginx
 
-    overall_logs = collection.count_documents({})
+    overall_logs = len(list(collection.find({})))
 
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-    mth_counter = {mth: collection.count_documents({"method": mth})
+    mth_counter = {mth: len(list(collection.find({"method": mth})))
                    for mth in methods}
 
-    stat_checker = collection.count_documents({"method": "GET",
-                                               "path": "/status"})
+    stat_checker = len(list(collection.find({"method": "GET",
+                                             "path": "/status"})))
 
     print("{} logs".format(overall_logs))
     print("Methods:")
