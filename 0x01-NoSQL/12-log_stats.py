@@ -18,7 +18,7 @@ def stats_logger():
                    for mth in methods}
 
     stat_checker = collection.count_documents({"method": "GET",
-                                             "path": "/status"})
+                                               "path": "/status"})
 
     print("{} logs".format(overall_logs))
     print("Methods:")
