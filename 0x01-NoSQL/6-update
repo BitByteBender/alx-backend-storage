@@ -1,0 +1,2 @@
+// Script that updates a doc in the collection school
+db.school.updateMany({ name: "Hollberton school" }, { $set: { address: "972 Mission street" } })
