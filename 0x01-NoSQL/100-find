@@ -1,0 +1,2 @@
+// Script that lists all docs with Holberton as a starting name in the collection school
+db.school.find({ "name": { $regex: "^Holberton" } }).forEach(doc => printjson(doc));
