@@ -8,7 +8,7 @@ from typing import Callable
 credis = redis.Redis()
 
 
-def cacher(method: Callable):
+def cacher(method: Callable) -> Callable:
     """
        Decorator that caches result of method and tracks
        number of accesses.
