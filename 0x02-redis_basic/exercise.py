@@ -59,8 +59,8 @@ def replay(method: Callable) -> None:
     i_key = "{}:inputs".format(method.__qualname__)
     o_key = "{}:outputs".format(method.__qualname__)
 
-    inputs = cache.__redis.lrangge(i_key, 0, -1)
-    outputs = cache.__redis.lrange(o_key, 0, -1)
+    inputs = cache._redis.lrange(i_key, 0, -1)
+    outputs = cache._redis.lrange(o_key, 0, -1)
 
     print("{} was called {} times:".format(method_name, len(inputs)))
 
