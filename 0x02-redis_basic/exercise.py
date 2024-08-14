@@ -51,7 +51,11 @@ def call_history(method: Callable) -> Callable:
 
 def replay(method: Callable) -> None:
     """
-       Displays calls history of a particular func
+       Displays calls history of a particular function
+       Generates keys for inputs/outputs lists
+       Retrieves all inputs and outputs from Redis
+       prints overall number of calls
+       decodes byts to str and formatting the output
     """
     cache = method.__self__
     method_name = method.__qualname__
