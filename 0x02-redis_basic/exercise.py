@@ -1,8 +1,27 @@
 #!/usr/bin/env python3
 """ Writing strings to Redis """
+import functools
 import redis
 import uuid
 from typing import Union, Callable, Optional
+
+
+def count_calls(method: Callable) -> Callable:
+    """
+       Decorator that counts method calling times
+    """
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+           Generates key using method's qualified name
+           Increments the call count in Redis
+           Call the original method and return its result
+        """
+        key = method.__qualname__
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+
+    return wrapper
 
 
 class Cache:
@@ -13,6 +32,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
             Generates a random key using uuid
