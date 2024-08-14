@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """ Writing strings to Redis """
-import functools
+from functools import wraps
 import redis
 import uuid
 from typing import Union, Callable, Optional
@@ -10,7 +10,7 @@ def count_calls(method: Callable) -> Callable:
     """
        Decorator that counts method calling times
     """
-    @functools.wraps(method)
+    @wraps(method)
     def wrapper(self, *args, **kwargs):
         """
            Generates key using method's qualified name
@@ -24,6 +24,31 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
+def call_history(method: Callable) -> Callable:
+    """
+       Decorator that stores the history of inputs and outputs for a method.
+    """
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+           Generates keys for (I/O)s
+           Stores input args as a str in a Redis list
+           Exec the original method
+           and gets output then stores it in Redis list
+           Returns output
+        """
+        i_key = "{}:inputs".format(method.__qualname__)
+        o_key = "{}:outputs".format(method.__qualname__)
+
+        self._redis.rpush(i_key, str(args))
+        output = method(self, *args, **kwargs)
+
+        self._redis.rpush(o_key, str(output))
+        return output
+
+    return wrapper
+
+
 class Cache:
     def __init__(self):
         """
@@ -33,6 +58,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
             Generates a random key using uuid
