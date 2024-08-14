@@ -25,6 +25,7 @@ def cacher(method: Callable) -> Callable:
             return cached_content.decode('utf-8')
 
         content = method(url)
+        credis.set("count:{}".format(url), 0)
         credis.setex("content:{}".format(url), 10, content)
 
         return content
