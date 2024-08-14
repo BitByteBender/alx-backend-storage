@@ -66,7 +66,10 @@ def replay(method: Callable) -> None:
     inputs = cache._redis.lrange(i_key, 0, -1)
     outputs = cache._redis.lrange(o_key, 0, -1)
 
-    print("{} was called {} times:".format(method_name, len(inputs)))
+    call_count = cache._redis.get(method_name)
+    call_count = int(call_count) if call_count else 0
+
+    print("{} was called {} times:".format(method_name, call_count))
 
     for i, o in zip(inputs, outputs):
         print("{}(*{}) -> {}".format(method_name,
