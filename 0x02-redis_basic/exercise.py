@@ -49,6 +49,26 @@ def call_history(method: Callable) -> Callable:
     return wrapper
 
 
+def replay(method: Callable) -> None:
+    """
+       Displays calls history of a particular func
+    """
+    cache = method.__self__
+    method_name = method.__qualname__
+
+    i_key = "{}:inputs".format(method.__qualname__)
+    o_key = "{}:outputs".format(method.__qualname__)
+
+    inputs = cache.__redis.lrangge(i_key, 0, -1)
+    outputs = cache.__redis.lrange(o_key, 0, -1)
+
+    print("{} was called {} times:".format(method_name, len(inputs)))
+
+    for i, o in zip(inputs, outputs):
+        print("{}(*{}) -> {}".format(method_name,
+              i.decode("utf-8"), o.decode("utf-8")))
+
+
 class Cache:
     def __init__(self):
         """
@@ -92,23 +112,3 @@ class Cache:
            Retrieves data from Redis and convert it into an int
         """
         return self.get(key, int)
-
-
-def replay(method: Callable) -> None:
-    """
-       Displays calls history of a particular func
-    """
-    cache = method.__self__
-    method_name = method.__qualname__
-
-    i_key = "{}:inputs".format(method.__qualname__)
-    o_key = "{}:outputs".format(method.__qualname__)
-
-    inputs = cache.__redis.lrangge(i_key, 0, -1)
-    outputs = cache.__redis.lrange(o_key, 0, -1)
-
-    print("{} was called {} times:".format(method_name, len(inputs)))
-
-    for i, o in zip(inputs, outputs):
-        print("{}(*{}) -> {}".format(method_name,
-              i.decode("utf-8"), o.decode("utf-8")))
